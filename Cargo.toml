@@ -3,8 +3,9 @@ name = "bevy-game"
 version = "0.1.0"
 edition = "2024"
 
-[dependencies]
-bevy = { version = "0.16", features = ["dynamic_linking"] } # make sure this is the latest version
+[dependencies.bevy]
+version = "0.16" # make sure this is the latest version
+default-features = true
 
 # Enable a small amount of optimization in the dev profile.
 [profile.dev]
