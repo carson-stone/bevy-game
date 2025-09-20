@@ -1,4 +1,4 @@
-use bevy::{color::palettes::css::GOLD, prelude::*};
+use bevy::{app::PluginGroupBuilder, color::palettes::css::GOLD, prelude::*};
 
 #[derive(Resource)]
 struct UiFont(Handle<Font>);
@@ -9,9 +9,7 @@ struct GameCamera;
 fn main() {
   App::new()
     .add_plugins(DefaultPlugins)
-    // set the global default clear color (background color for cameras)
-    .insert_resource(ClearColor(Color::linear_rgb(0.9, 0.3, 0.6)))
-    .add_systems(Startup, (load_ui_font, setup, (write_text)).chain())
+    .add_plugins(GamePluginGroup)
     .run();
 }
 
@@ -49,4 +47,23 @@ fn write_text(mut commands: Commands, font_handle: Res<UiFont>) {
       ..default()
     },
   ));
+}
+
+struct GamePlugin;
+
+impl Plugin for GamePlugin {
+  fn build(&self, app: &mut App) {
+    // set the global default clear color (background color for cameras)
+    app
+      .insert_resource(ClearColor(Color::linear_rgb(0.9, 0.3, 0.6)))
+      .add_systems(Startup, (load_ui_font, setup, (write_text)).chain());
+  }
+}
+
+struct GamePluginGroup;
+
+impl PluginGroup for GamePluginGroup {
+  fn build(self) -> PluginGroupBuilder {
+    PluginGroupBuilder::start::<Self>().add(GamePlugin)
+  }
 }
