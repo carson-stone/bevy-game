@@ -11,7 +11,7 @@ impl Plugin for GamePlugin {
     // set the global default clear color (background color for cameras)
     app
       .insert_resource(ClearColor(Color::linear_rgb(0.9, 0.3, 0.6)))
-      .add_systems(Startup, (font::load_ui_font, setup, (write_text)).chain());
+      .add_systems(Startup, (setup, (write_text)).chain());
   }
 }
 
@@ -19,7 +19,9 @@ pub struct GamePluginGroup;
 
 impl PluginGroup for GamePluginGroup {
   fn build(self) -> PluginGroupBuilder {
-    PluginGroupBuilder::start::<Self>().add(GamePlugin)
+    PluginGroupBuilder::start::<Self>()
+      .add(GamePlugin)
+      .add(ui::UiPlugin)
   }
 }
 
