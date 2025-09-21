@@ -6,6 +6,8 @@ pub struct UiPlugin;
 
 impl Plugin for UiPlugin {
   fn build(&self, app: &mut App) {
-    app.add_systems(Startup, font::load_ui_font);
+    app
+      .add_systems(Startup, font::load_ui_font)
+      .add_systems(Update, font::write_text);
   }
 }
