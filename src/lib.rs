@@ -4,13 +4,15 @@ mod ui;
 use bevy::{app::PluginGroupBuilder, color::palettes::css::GOLD, prelude::*};
 use ui::font;
 
+const BACKGROUND_COLOR: Color = Color::linear_rgb(0.9, 0.3, 0.6);
+
 struct GamePlugin;
 
 impl Plugin for GamePlugin {
   fn build(&self, app: &mut App) {
     // set the global default clear color (background color for cameras)
     app
-      .insert_resource(ClearColor(Color::linear_rgb(0.9, 0.3, 0.6)))
+      .insert_resource(ClearColor(BACKGROUND_COLOR))
       .add_systems(Startup, (setup, (write_text)).chain());
   }
 }
