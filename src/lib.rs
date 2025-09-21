@@ -26,7 +26,7 @@ impl PluginGroup for GamePluginGroup {
 }
 
 fn setup(mut commands: Commands) {
-  println!("setting up game");
+  info!("setting up game");
 
   // setup camera
   commands.spawn((Camera2d::default(), camera::GameCamera));
