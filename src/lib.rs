@@ -1,7 +1,9 @@
 mod camera;
+mod gameplay;
 mod ui;
 
 use bevy::{app::PluginGroupBuilder, prelude::*};
+use gameplay::build_world;
 
 struct GamePlugin;
 
@@ -22,6 +24,8 @@ impl PluginGroup for GamePluginGroup {
   }
 }
 
-fn setup() {
+fn setup(commands: Commands) {
   info!("setting up game");
+
+  build_world(commands);
 }

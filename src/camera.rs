@@ -15,8 +15,9 @@ impl Plugin for CameraPlugin {
 }
 
 #[derive(Component)]
+#[require(Camera2d)]
 pub struct GameCamera;
 
 fn setup_camera(mut commands: Commands) {
-  commands.spawn((Camera2d::default(), GameCamera));
+  commands.spawn(GameCamera);
 }
