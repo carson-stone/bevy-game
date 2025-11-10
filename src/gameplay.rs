@@ -5,6 +5,8 @@ use bevy::prelude::*;
 use player::PlayerBundle;
 use wall::{AreaLocation, Wall};
 
+pub use player::move_player;
+
 #[derive(Component, Default)]
 struct Collider;
 
@@ -17,4 +19,9 @@ pub fn build_world(mut commands: Commands) {
 
   // player
   commands.spawn(PlayerBundle::new());
+}
+
+#[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GameplaySet {
+  Player,
 }

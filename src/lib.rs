@@ -3,13 +3,15 @@ mod gameplay;
 mod ui;
 
 use bevy::{app::PluginGroupBuilder, prelude::*};
-use gameplay::build_world;
+use gameplay::{GameplaySet, build_world, move_player};
 
 struct GamePlugin;
 
 impl Plugin for GamePlugin {
   fn build(&self, app: &mut App) {
-    app.add_systems(Startup, setup);
+    app
+      .add_systems(Startup, setup)
+      .add_systems(FixedUpdate, (move_player).in_set(GameplaySet::Player));
   }
 }
 
