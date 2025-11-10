@@ -19,10 +19,10 @@ impl AreaLocation {
   /// Location of the *center* of the wall, used in `transform.translation()`
   fn position(&self) -> Vec2 {
     match self {
-      AreaLocation::Left => Vec2::new(LEFT_WALL, 0.),
-      AreaLocation::Right => Vec2::new(RIGHT_WALL, 0.),
-      AreaLocation::Bottom => Vec2::new(0., BOTTOM_WALL),
-      AreaLocation::Top => Vec2::new(0., TOP_WALL),
+      AreaLocation::Left => Vec2::new(LEFT_WALL, 0.0),
+      AreaLocation::Right => Vec2::new(RIGHT_WALL, 0.0),
+      AreaLocation::Bottom => Vec2::new(0.0, BOTTOM_WALL),
+      AreaLocation::Top => Vec2::new(0.0, TOP_WALL),
     }
   }
 
