@@ -11,7 +11,7 @@ impl Plugin for GamePlugin {
   fn build(&self, app: &mut App) {
     app
       .add_systems(Startup, setup)
-      .add_systems(FixedUpdate, (move_player).in_set(GameplaySet::Player));
+      .add_systems(Update, (move_player).in_set(GameplaySet::Player));
   }
 }
 
