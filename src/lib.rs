@@ -1,33 +1,38 @@
 mod camera;
 mod gameplay;
+mod input;
 mod ui;
 
 use bevy::{app::PluginGroupBuilder, prelude::*};
-use gameplay::{
-  GameplaySet, apply_enemy_ai, build_world, check_for_collisions, move_enemy, move_player,
-  update_player_velocity,
-};
+use camera::CameraPlugin;
+use gameplay::{CollisionEvent, GameplaySet};
+use input::{InputSet, MovePlayerEvent};
+use ui::UiPlugin;
 
 struct GamePlugin;
 
 impl Plugin for GamePlugin {
   fn build(&self, app: &mut App) {
-    app.add_systems(Startup, setup).add_systems(
-      Update,
-      (
+    app
+      .add_systems(Startup, setup)
+      .add_systems(
+        Update,
         (
-          update_player_velocity.before(check_for_collisions),
-          move_player,
-        )
-          .in_set(GameplaySet::Player),
-        (
-          (apply_enemy_ai.before(move_enemy)),
-          (move_enemy).before(check_for_collisions),
-        )
-          .in_set(GameplaySet::Enemy),
-        check_for_collisions,
-      ),
-    );
+          (input::handle_player_input)
+            .in_set(InputSet)
+            .before(GameplaySet::Player),
+          (gameplay::update_player_velocity, gameplay::move_player)
+            .chain()
+            .in_set(GameplaySet::Player),
+          (gameplay::apply_enemy_ai, gameplay::move_enemy)
+            .chain()
+            .in_set(GameplaySet::Enemy)
+            .after(GameplaySet::Player),
+          (gameplay::check_for_collisions, gameplay::debug_collisions).chain(),
+        ),
+      )
+      .add_event::<MovePlayerEvent>()
+      .add_event::<CollisionEvent>();
   }
 }
 
@@ -37,13 +42,13 @@ impl PluginGroup for GamePluginGroup {
   fn build(self) -> PluginGroupBuilder {
     PluginGroupBuilder::start::<Self>()
       .add(GamePlugin)
-      .add(camera::CameraPlugin)
-      .add(ui::UiPlugin)
+      .add(CameraPlugin)
+      .add(UiPlugin)
   }
 }
 
 fn setup(commands: Commands) {
   info!("setting up game");
 
-  build_world(commands);
+  gameplay::build_world(commands);
 }

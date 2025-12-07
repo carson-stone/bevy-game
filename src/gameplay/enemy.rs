@@ -1,53 +1,66 @@
+use super::collisions::Collider;
 use super::health::Health;
+use super::player::Player;
 use super::velocity::Velocity;
 use super::wall::*;
 use bevy::prelude::*;
 
 pub const ENEMY_SIZE: Vec2 = Vec2::new(30.0, 30.0);
-const ENEMY_SPEED: f32 = 75.0;
 // How close can the enemy get to the wall
 const ENEMY_PADDING: f32 = 0.0;
+const ENEMY_SPEED: f32 = 75.0;
 
-#[derive(Component)]
-#[require(Sprite, Transform, super::Collider, Health)]
+#[derive(Component, Default)]
+#[require(Sprite, Collider, Velocity, Health)]
 pub struct Enemy;
 
 #[derive(Bundle)]
 pub struct EnemyBundle {
   pub marker: Enemy,
-  // We can nest/include another bundle.
-  // Add the components for a standard Bevy Sprite:
   pub sprite: Sprite,
+  pub collider: Collider,
+  pub velocity: Velocity,
   pub transform: Transform,
-  pub collider: super::Collider,
   pub health: Health,
 }
 
 impl Default for EnemyBundle {
   fn default() -> Self {
     Self {
-      marker: Enemy,
+      marker: Enemy::default(),
       sprite: Sprite::from_color(Color::srgb(1.2, 1.2, 5.5), Vec2::ONE),
+      collider: Collider::default(),
+      velocity: Velocity { x: 0.0, y: 0.0 },
       transform: Transform {
         translation: Vec2::ZERO.extend(0.0),
         scale: ENEMY_SIZE.extend(1.0),
         ..default()
       },
-      collider: super::Collider::default(),
       health: Health(100),
     }
   }
 }
 
-pub fn apply_enemy_ai(enemy_query: Single<(&mut Velocity, &mut Transform), With<Enemy>>) {
-  let (mut velocity, transform) = enemy_query.into_inner();
-
-  let should_move_down = transform.translation.y > 0.0;
+pub fn apply_enemy_ai(
+  player_query: Single<&Transform, With<Player>>,
+  enemy_query: Single<(&Transform, &mut Velocity), With<Enemy>>,
+) {
+  let player_transform = player_query.into_inner();
+  let (enemy_transform, mut enemy_velocity) = enemy_query.into_inner();
 
   let mut direction = Vec2::ZERO;
-  direction.y = if should_move_down { -1.0 } else { 1.0 };
 
-  velocity.y = direction.y * ENEMY_SPEED;
+  let x_diff = enemy_transform.translation.x - player_transform.translation.x;
+  let y_diff = enemy_transform.translation.y - player_transform.translation.y;
+
+  if x_diff.abs() > y_diff.abs() {
+    direction.x = if x_diff < 0.0 { 1.0 } else { -1.0 };
+  } else {
+    direction.y = if y_diff < 0.0 { 1.0 } else { -1.0 };
+  }
+
+  enemy_velocity.x = direction.x * ENEMY_SPEED;
+  enemy_velocity.y = direction.y * ENEMY_SPEED;
 }
 
 pub fn move_enemy(

@@ -1,3 +1,4 @@
+use super::collisions::Collider;
 use bevy::prelude::*;
 
 pub const WALL_THICKNESS: f32 = 4.0;
@@ -46,11 +47,11 @@ impl AreaLocation {
 }
 
 #[derive(Component)]
-#[require(Sprite, Transform, super::Collider)]
+#[require(Sprite, Transform, Collider)]
 pub struct Wall;
 
 impl Wall {
-  pub fn new(area_location: AreaLocation) -> (Wall, Sprite, Transform, super::Collider) {
+  pub fn new(area_location: AreaLocation) -> (Wall, Sprite, Transform, Collider) {
     (
       Wall,
       Sprite::from_color(Color::srgb(0.8, 0.8, 0.8), Vec2::ONE),
@@ -63,7 +64,7 @@ impl Wall {
         scale: area_location.size().extend(1.0),
         ..default()
       },
-      super::Collider::default(),
+      Collider::default(),
     )
   }
 }
