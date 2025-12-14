@@ -1,7 +1,6 @@
-use super::collisions::Collider;
 use super::health::Health;
+use super::physics::{Collider, CollisionEvent, Velocity};
 use super::utils::Direction;
-use super::velocity::Velocity;
 use super::wall::*;
 use crate::input::MovePlayerEvent;
 use bevy::prelude::*;
@@ -61,6 +60,37 @@ pub fn update_player_velocity(
 
   player_velocity.x = new_velocity.x * PLAYER_SPEED;
   player_velocity.y = new_velocity.y * PLAYER_SPEED;
+}
+
+pub fn adjust_player_velocity_when_collision(
+  mut commands: Commands,
+  mut collision_event_reader: EventReader<CollisionEvent>,
+  player_query: Single<(Entity, &mut Transform, &mut Velocity), With<Player>>,
+) {
+  let (player_entity, player_transform, player_velocity) = player_query.into_inner();
+
+  // debug: destroy player
+  for event in collision_event_reader.read() {
+    let entity_a = event.0;
+    let entity_b = event.1;
+
+    if player_entity == entity_a {
+      info!("player was entity_a");
+    } else if player_entity == entity_b {
+      info!("player was entity_a");
+    } else {
+      return;
+    }
+
+    let next_position = Vec2::new(
+      player_transform.translation.x * player_velocity.x,
+      player_transform.translation.y * player_velocity.y,
+    );
+
+    info!(?next_position);
+
+    commands.entity(player_entity).despawn();
+  }
 }
 
 pub fn move_player(

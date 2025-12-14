@@ -1,8 +1,9 @@
-use super::Wall;
+use super::super::Wall;
 use bevy::{
   math::bounding::{Aabb2d, BoundingVolume, IntersectsVolume},
   prelude::*,
 };
+use std::collections::HashSet;
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum Collision {
@@ -46,6 +47,8 @@ pub fn check_for_collisions(
   collider_query_a: Query<(Entity, &Transform, Option<&Wall>), With<Collider>>,
   collider_query_b: Query<(Entity, &Transform, Option<&Wall>), With<Collider>>,
 ) {
+  let mut entities_colliding: HashSet<(Entity, Entity)> = HashSet::new();
+
   for (entity_a, transform_a, maybe_wall_a) in &collider_query_a {
     for (entity_b, transform_b, maybe_wall_b) in &collider_query_b {
       // prevent collisions between a transform and itself
@@ -58,6 +61,14 @@ pub fn check_for_collisions(
         continue;
       }
 
+      // prevent double-processing of collisions
+      if entities_colliding.contains(&(entity_a, entity_b))
+        || entities_colliding.contains(&(entity_b, entity_a))
+      {
+        continue;
+      }
+
+      // check for a collision
       let collision = determine_collision(
         Aabb2d::new(
           transform_a.translation.truncate(),
@@ -69,7 +80,13 @@ pub fn check_for_collisions(
         ),
       );
 
+      // handle collision
       if collision.is_some() {
+        // keep track of collisions so we don't double-process them
+        entities_colliding.insert((entity_a, entity_b));
+        entities_colliding.insert((entity_b, entity_a));
+
+        // emit a collision event
         collision_event_writer.write(CollisionEvent(entity_a, entity_b, collision.unwrap()));
       }
     }

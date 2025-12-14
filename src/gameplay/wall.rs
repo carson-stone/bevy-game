@@ -1,4 +1,4 @@
-use super::collisions::Collider;
+use super::physics::Collider;
 use bevy::prelude::*;
 
 pub const WALL_THICKNESS: f32 = 4.0;

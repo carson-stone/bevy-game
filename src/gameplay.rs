@@ -1,9 +1,8 @@
-mod collisions;
 mod enemy;
 mod health;
+mod physics;
 mod player;
 mod utils;
-mod velocity;
 mod wall;
 
 use bevy::prelude::*;
@@ -12,9 +11,9 @@ use health::Health;
 use player::{Player, PlayerBundle};
 use wall::{AreaLocation, Wall};
 
-pub use collisions::{CollisionEvent, check_for_collisions, debug_collisions};
 pub use enemy::{apply_enemy_ai, move_enemy};
-pub use player::{move_player, update_player_velocity};
+pub use physics::{CollisionEvent, check_for_collisions, debug_collisions};
+pub use player::{adjust_player_velocity_when_collision, move_player, update_player_velocity};
 pub use utils::Direction;
 
 pub fn build_world(mut commands: Commands) {

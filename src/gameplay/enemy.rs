@@ -1,7 +1,6 @@
-use super::collisions::Collider;
 use super::health::Health;
+use super::physics::{Collider, Velocity};
 use super::player::Player;
-use super::velocity::Velocity;
 use super::wall::*;
 use bevy::prelude::*;
 
