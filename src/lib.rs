@@ -29,10 +29,15 @@ impl Plugin for GamePlugin {
           )
             .chain()
             .in_set(GameplaySet::Player),
-          (gameplay::apply_enemy_ai, gameplay::move_enemy)
-            .chain()
-            .in_set(GameplaySet::Enemy),
-          (gameplay::check_for_collisions, gameplay::debug_collisions).chain(),
+          // (gameplay::apply_enemy_ai, gameplay::move_enemy)
+          //   .chain()
+          //   .in_set(GameplaySet::Enemy),
+          (
+            gameplay::check_for_collisions,
+            gameplay::debug_collisions,
+            gameplay::debug_collision_events,
+          )
+            .chain(),
         ),
       )
       // events

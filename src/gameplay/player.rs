@@ -1,5 +1,5 @@
 use super::health::Health;
-use super::physics::{Collider, CollisionEvent, Velocity};
+use super::physics::{Collider, CollisionEvent, Velocity, collision_debugger::CollisionDebugger};
 use super::utils::Direction;
 use super::wall::*;
 use crate::input::MovePlayerEvent;
@@ -11,17 +11,18 @@ const PLAYER_PADDING: f32 = 0.0;
 const PLAYER_SPEED: f32 = 200.0;
 
 #[derive(Component, Default)]
-#[require(Sprite, Collider, Velocity, Health)]
+#[require(Sprite, Collider, CollisionDebugger, Velocity, Health)]
 pub struct Player;
 
 #[derive(Bundle)]
 pub struct PlayerBundle {
-  marker: Player,
-  sprite: Sprite,
-  collider: Collider,
-  velocity: Velocity,
-  transform: Transform,
-  health: Health,
+  pub marker: Player,
+  pub sprite: Sprite,
+  pub collider: Collider,
+  pub collision_debugger: CollisionDebugger,
+  pub velocity: Velocity,
+  pub transform: Transform,
+  pub health: Health,
 }
 
 impl Default for PlayerBundle {
@@ -30,6 +31,9 @@ impl Default for PlayerBundle {
       marker: Player::default(),
       sprite: Sprite::from_color(Color::srgb(1.0, 1.0, 0.5), Vec2::ONE),
       collider: Collider::default(),
+      collision_debugger: CollisionDebugger {
+        target_entity: None,
+      },
       velocity: Velocity { x: 0.0, y: 0.0 },
       transform: Transform {
         translation: Vec2::ZERO.extend(0.0),
@@ -71,8 +75,7 @@ pub fn adjust_player_velocity_when_collision(
 
   // debug: destroy player
   for event in collision_event_reader.read() {
-    let entity_a = event.0;
-    let entity_b = event.1;
+    let (entity_a, entity_b) = event.0;
 
     if player_entity == entity_a {
       info!("player was entity_a");
@@ -87,7 +90,7 @@ pub fn adjust_player_velocity_when_collision(
       player_transform.translation.y * player_velocity.y,
     );
 
-    info!(?next_position);
+    debug!(?next_position);
 
     commands.entity(player_entity).despawn();
   }

@@ -1,7 +1,5 @@
 mod collisions;
 mod velocity;
 
-use bevy::prelude::*;
-
-pub use collisions::*;
+pub use collisions::{collision_debugger, *};
 pub use velocity::*;
