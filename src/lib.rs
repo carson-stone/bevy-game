@@ -13,6 +13,9 @@ struct GamePlugin;
 
 impl Plugin for GamePlugin {
   fn build(&self, app: &mut App) {
+    // init gizmos (visual debugging tools provided by bevy)
+    app.init_gizmo_group::<AabbGizmoConfigGroup>();
+
     // add systems to schedules and sets and register events
     app
       // Startup
@@ -39,8 +42,10 @@ impl Plugin for GamePlugin {
           )
             .chain(),
         ),
-      )
-      // events
+      );
+
+    // events
+    app
       .add_event::<MovePlayerEvent>()
       .add_event::<CollisionEvent>();
 

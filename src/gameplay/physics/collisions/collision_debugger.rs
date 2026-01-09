@@ -1,5 +1,5 @@
 use super::{Collider, CollisionEvent, Velocity};
-use bevy::prelude::*;
+use bevy::{color::palettes::css::*, math::Isometry2d, prelude::*};
 
 // component that enables detailed collision debugging between two entities
 #[derive(Component, Default)]
@@ -21,16 +21,46 @@ pub struct CollisionDebugger {
 /// 3. Show AABBs of entities.
 /// 4. Show results:
 ///   - time to collision
-///   - ray from origin of entity being debugged to point of collision on target.
-///   - normal vector at point of collision
+///   - line from origin of entity being debugged to point of collision on target.
+///   - ray that is the normal vector at the point of collision
 pub fn debug_collisions(
-  colliders_query: Query<
+  mut gizmos: Gizmos,
+  debugger_query: Query<
     (Entity, &Transform, &Velocity, &CollisionDebugger),
     With<CollisionDebugger>,
   >,
+  colliders_query: Query<&Transform, With<Collider>>,
 ) {
-  for (entity, transform, velocity, debugger) in colliders_query.iter() {
-    debug!("Entity: {:?}, Target: {:?}", entity, debugger.target_entity);
+  // For entities that have debuggers which have `Some` target entity, use the bevy-provided `gizmos`
+  // tool to add lines for visual debugging.
+  for (entity, transform, velocity, debugger) in debugger_query
+    .iter()
+    .filter(|to_debug| to_debug.3.target_entity.is_some())
+  {
+    if debugger.target_entity.is_none() {
+      continue;
+    }
+
+    let target_entity = debugger.target_entity.unwrap();
+
+    let target_result = colliders_query.get(target_entity);
+
+    if !target_result.is_ok() {
+      eprintln!(
+        "Error debugging collisions: Entity {:?} has target {:?}, but target could not be retrieved from query",
+        entity, target_entity
+      );
+      continue;
+    }
+
+    let target = target_result.ok().unwrap();
+
+    gizmos.line_2d(
+      Vec2::new(transform.translation.x, transform.translation.y),
+      Vec2::new(target.translation.x, target.translation.y),
+      RED,
+    );
+    // gizmos.ray_2d(Vec2::Y * sin_t_scaled, Vec2::splat(80.), LIME);
   }
 }
 
